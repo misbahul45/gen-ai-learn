@@ -1,0 +1,352 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/misbahul45/gen-ai-learn/blob/master/Data%20Preprocessing%20and%20Embeddings/union_material\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "texts = [\n",
+        "    \"\"\"\n",
+        "    Halo! Nama saya Misbahul Muttaqin, biasa dipanggil Taqin. Saya mahasiswa Sistem Informasi di Universitas Airlangga, Gresik asalnya, sekarang tinggal di Surabaya.\n",
+        "    Sejak pandemi 2020, saya mulai tertarik belajar pemrograman. Awalnya coba-coba HTML, CSS, dan JavaScript, eh ternyata seru banget! 🤩\n",
+        "    Tahun 2023 sempat gagal masuk PTN, tapi alhamdulillah 2024 lolos UNAIR. Tahun gap year saya pakai buat belajar otodidak: ikut kursus online, baca artikel di Medium, dan latihan soal di LeetCode.\n",
+        "    Sekarang saya lagi mendalami AI dan pengolahan bahasa alami (NLP), terutama ingin fokus ke edukasi digital dan pembuatan platform pembelajaran.\n",
+        "    Btw, kalian ada rekomendasi channel YouTube buat belajar machine learning dari dasar nggak? 🙏 Soalnya kadang bingung harus mulai dari mana, dan kebanyakan tutorial terlalu ribet 😵‍💫.\n",
+        "    Saya pengen banget bikin sistem chatbot edukasi pakai Retrieval-Augmented Generation (RAG) yang bisa jawab pertanyaan pelajar kayak: “Gimana sih cara kerja backpropagation?” atau “Apa bedanya SVM sama Decision Tree?”\n",
+        "    \"\"\",\n",
+        "\n",
+        "    \"\"\"\n",
+        "    Tadi malam aku nonton diskusi di Twitter Spaces soal pendidikan digital dan AI. Ada pembicara dari Kemendikbud, dosen UI, sama beberapa startup founder.\n",
+        "    Yang bikin aku kaget, katanya 65% siswa di Indonesia masih belum bisa akses internet stabil 😔. Bahkan di beberapa daerah, sinyal 3G aja susah.\n",
+        "    Salah satu solusi yang mereka usulkan adalah pakai teknologi edge computing dan model language lightweight supaya bisa dijalankan offline.\n",
+        "    Trus, ada yang bahas juga soal pentingnya literasi digital: bukan cuma ngerti cara buka Google, tapi ngerti gimana filter informasi, validasi sumber, dan berpikir kritis 🧠.\n",
+        "    Aku sendiri ngerasa banyak banget info di TikTok & IG yang misleading, apalagi soal kesehatan mental dan keuangan. Harusnya kita diajarin dari sekolah buat ngecek hoax dan tahu mana sumber kredibel.\n",
+        "    \"\"\",\n",
+        "\n",
+        "    \"\"\"\n",
+        "    Jujur akhir-akhir ini mentalku agak drop... tugas-tugas kuliah numpuk, coding error mulu, belum lagi revisian proyek kelompok yang nggak kelar-kelar 😮‍💨.\n",
+        "    Gw udah coba ngatur waktu pake Notion dan Trello, tapi tetep aja overwhelmed. Kadang ngeliat orang lain progress-nya cepet bikin makin insecure.\n",
+        "    Untungnya gw nemu forum Discord yang isinya anak-anak tech dari berbagai kampus. Tiap malam mereka suka sharing resource, kasih motivasi, dan bahas tools baru.\n",
+        "    Kemarin misalnya ada yg ngasih link ke GitHub repo yang isinya contoh penerapan RAG di chatbot edukasi, terus ada juga yang review buku “Deep Learning with Python” edisi terbaru.\n",
+        "    Gw pengen bisa konsisten belajar tiap hari, meskipun cuma 30 menit. Self-discipline > motivation katanya.\n",
+        "    So, doain ya semoga gw bisa tetap semangat dan someday bisa bikin startup edukasi juga. Amin! 🚀\n",
+        "    \"\"\"\n",
+        "]\n",
+        "texts"
+      ],
+      "metadata": {
+        "id": "GCXVa-kU0_kV",
+        "outputId": "922b58e8-0248-4818-e80f-9486abfead86",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['\\n    Halo! Nama saya Misbahul Muttaqin, biasa dipanggil Taqin. Saya mahasiswa Sistem Informasi di Universitas Airlangga, Gresik asalnya, sekarang tinggal di Surabaya. \\n    Sejak pandemi 2020, saya mulai tertarik belajar pemrograman. Awalnya coba-coba HTML, CSS, dan JavaScript, eh ternyata seru banget! 🤩\\n    Tahun 2023 sempat gagal masuk PTN, tapi alhamdulillah 2024 lolos UNAIR. Tahun gap year saya pakai buat belajar otodidak: ikut kursus online, baca artikel di Medium, dan latihan soal di LeetCode.\\n    Sekarang saya lagi mendalami AI dan pengolahan bahasa alami (NLP), terutama ingin fokus ke edukasi digital dan pembuatan platform pembelajaran. \\n    Btw, kalian ada rekomendasi channel YouTube buat belajar machine learning dari dasar nggak? 🙏 Soalnya kadang bingung harus mulai dari mana, dan kebanyakan tutorial terlalu ribet 😵\\u200d💫.\\n    Saya pengen banget bikin sistem chatbot edukasi pakai Retrieval-Augmented Generation (RAG) yang bisa jawab pertanyaan pelajar kayak: “Gimana sih cara kerja backpropagation?” atau “Apa bedanya SVM sama Decision Tree?”\\n    ',\n",
+              " '\\n    Tadi malam aku nonton diskusi di Twitter Spaces soal pendidikan digital dan AI. Ada pembicara dari Kemendikbud, dosen UI, sama beberapa startup founder. \\n    Yang bikin aku kaget, katanya 65% siswa di Indonesia masih belum bisa akses internet stabil 😔. Bahkan di beberapa daerah, sinyal 3G aja susah. \\n    Salah satu solusi yang mereka usulkan adalah pakai teknologi edge computing dan model language lightweight supaya bisa dijalankan offline.\\n    Trus, ada yang bahas juga soal pentingnya literasi digital: bukan cuma ngerti cara buka Google, tapi ngerti gimana filter informasi, validasi sumber, dan berpikir kritis 🧠.\\n    Aku sendiri ngerasa banyak banget info di TikTok & IG yang misleading, apalagi soal kesehatan mental dan keuangan. Harusnya kita diajarin dari sekolah buat ngecek hoax dan tahu mana sumber kredibel.\\n    ',\n",
+              " '\\n    Jujur akhir-akhir ini mentalku agak drop... tugas-tugas kuliah numpuk, coding error mulu, belum lagi revisian proyek kelompok yang nggak kelar-kelar 😮\\u200d💨.\\n    Gw udah coba ngatur waktu pake Notion dan Trello, tapi tetep aja overwhelmed. Kadang ngeliat orang lain progress-nya cepet bikin makin insecure.\\n    Untungnya gw nemu forum Discord yang isinya anak-anak tech dari berbagai kampus. Tiap malam mereka suka sharing resource, kasih motivasi, dan bahas tools baru.\\n    Kemarin misalnya ada yg ngasih link ke GitHub repo yang isinya contoh penerapan RAG di chatbot edukasi, terus ada juga yang review buku “Deep Learning with Python” edisi terbaru.\\n    Gw pengen bisa konsisten belajar tiap hari, meskipun cuma 30 menit. Self-discipline > motivation katanya. \\n    So, doain ya semoga gw bisa tetap semangat dan someday bisa bikin startup edukasi juga. Amin! 🚀\\n    ']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import re\n",
+        "import unicodedata\n",
+        "import string\n",
+        "# make to lowercase\n",
+        "def text_to_lower(text):\n",
+        "  return text.lower()\n",
+        "\n",
+        "# remove space\n",
+        "def remove_space(text):\n",
+        "  return re.sub(r'\\s+','',text).strip()\n",
+        "\n",
+        "# normalisasi unicode\n",
+        "def normalize_text(text):\n",
+        "    return unicodedata.normalize('NFC', text)\n",
+        "\n",
+        "# remove punction\n",
+        "def remove_punct(text):\n",
+        "  return \"\".join([w for w in text if w not in string.punctuation])"
+      ],
+      "metadata": {
+        "id": "Ods37nfo1G-j"
+      },
+      "execution_count": 8,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install emoji\n",
+        "\n",
+        "import emoji\n",
+        "def remove_emoji(text):\n",
+        "  return emoji.replace_emoji(text, replace='')"
+      ],
+      "metadata": {
+        "id": "cBYKRl6t36rM",
+        "outputId": "fc824d61-af9e-42b6-dd97-235f5b33f99a",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 10,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting emoji\n",
+            "  Downloading emoji-2.14.1-py3-none-any.whl.metadata (5.7 kB)\n",
+            "Downloading emoji-2.14.1-py3-none-any.whl (590 kB)\n",
+            "\u001b[?25l   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/590.6 kB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K   \u001b[91m━━━━━━━━━━━━━━━━\u001b[0m\u001b[91m╸\u001b[0m\u001b[90m━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m245.8/590.6 kB\u001b[0m \u001b[31m7.2 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m590.6/590.6 kB\u001b[0m \u001b[31m10.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hInstalling collected packages: emoji\n",
+            "Successfully installed emoji-2.14.1\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install nltk\n",
+        "\n",
+        "import nltk\n",
+        "nltk.download('stopwords')\n",
+        "nltk.download('punkt')"
+      ],
+      "metadata": {
+        "id": "-dK60A_v3NCH",
+        "outputId": "3387d370-0155-4e9f-afaf-c1284269d351",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: nltk in /usr/local/lib/python3.11/dist-packages (3.9.1)\n",
+            "Requirement already satisfied: click in /usr/local/lib/python3.11/dist-packages (from nltk) (8.2.1)\n",
+            "Requirement already satisfied: joblib in /usr/local/lib/python3.11/dist-packages (from nltk) (1.5.1)\n",
+            "Requirement already satisfied: regex>=2021.8.3 in /usr/local/lib/python3.11/dist-packages (from nltk) (2024.11.6)\n",
+            "Requirement already satisfied: tqdm in /usr/local/lib/python3.11/dist-packages (from nltk) (4.67.1)\n"
+          ]
+        },
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "[nltk_data] Downloading package stopwords to /root/nltk_data...\n",
+            "[nltk_data]   Unzipping corpora/stopwords.zip.\n",
+            "[nltk_data] Downloading package punkt to /root/nltk_data...\n",
+            "[nltk_data]   Unzipping tokenizers/punkt.zip.\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "True"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 9
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from nltk.corpus import stopwords\n",
+        "from nltk.tokenize import word_tokenize\n",
+        "\n",
+        "# handle tokenizer and stopword\n",
+        "\n",
+        "def remove_stopwords(text, lang='indonesian'):\n",
+        "  # get stopwords\n",
+        "  stop_words=set(stopwords.words(lang))\n",
+        "\n",
+        "  # filtering\n",
+        "  return \" \".join([w for w in word_tokenize(text) if w not in stop_words])\n",
+        "\n",
+        "def tokenizer_text(text):\n",
+        "  return word_tokenize(text)\n"
+      ],
+      "metadata": {
+        "id": "hJXxGBNw3gr_"
+      },
+      "execution_count": 12,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import nltk\n",
+        "from nltk.stem import PorterStemmer\n",
+        "from nltk.stem import WordNetLemmatizer\n",
+        "from nltk import pos_tag, word_tokenize\n",
+        "from nltk.corpus import wordnet\n",
+        "\n",
+        "# Download resource yang dibutuhkan\n",
+        "nltk.download(\"averaged_perceptron_tagger\")\n",
+        "nltk.download(\"wordnet\")\n",
+        "nltk.download(\"omw-1.4\")\n",
+        "\n",
+        "# Stemming\n",
+        "def base_text(text):\n",
+        "    ps = PorterStemmer()\n",
+        "    return \" \".join([ps.stem(w) for w in word_tokenize(text)])\n",
+        "\n",
+        "# Mapping POS tag NLTK ke WordNet POS tag\n",
+        "def get_wordnet_pos(treebank_tag):\n",
+        "    if treebank_tag.startswith('J'):\n",
+        "        return wordnet.ADJ\n",
+        "    elif treebank_tag.startswith('V'):\n",
+        "        return wordnet.VERB\n",
+        "    elif treebank_tag.startswith('N'):\n",
+        "        return wordnet.NOUN\n",
+        "    elif treebank_tag.startswith('R'):\n",
+        "        return wordnet.ADV\n",
+        "    else:\n",
+        "        return wordnet.NOUN  # Default ke noun\n",
+        "\n",
+        "# Lemmatisasi dengan POS tag\n",
+        "def lemm_text(text):\n",
+        "    lemmatizer = WordNetLemmatizer()\n",
+        "    tokens = word_tokenize(text)\n",
+        "    tagged_tokens = pos_tag(tokens)\n",
+        "\n",
+        "    lemmatized_words = [\n",
+        "        lemmatizer.lemmatize(word, get_wordnet_pos(tag))\n",
+        "        for word, tag in tagged_tokens\n",
+        "    ]\n",
+        "\n",
+        "    return \" \".join(lemmatized_words)"
+      ],
+      "metadata": {
+        "id": "e_AkX4Oi5jzQ",
+        "outputId": "b69dcebc-9950-4497-b411-358b7680c155",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 14,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "[nltk_data] Downloading package punkt to /root/nltk_data...\n",
+            "[nltk_data]   Package punkt is already up-to-date!\n",
+            "[nltk_data] Downloading package averaged_perceptron_tagger to\n",
+            "[nltk_data]     /root/nltk_data...\n",
+            "[nltk_data]   Unzipping taggers/averaged_perceptron_tagger.zip.\n",
+            "[nltk_data] Downloading package wordnet to /root/nltk_data...\n",
+            "[nltk_data]   Package wordnet is already up-to-date!\n",
+            "[nltk_data] Downloading package omw-1.4 to /root/nltk_data...\n",
+            "[nltk_data]   Package omw-1.4 is already up-to-date!\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install requests\n",
+        "import pandas as pd\n",
+        "import re\n",
+        "import requests\n",
+        "\n",
+        "# handle slang or make normalizer text lke become like or in indo say become saya\n",
+        "\n",
+        "SLANG_URL='https://raw.githubusercontent.com/nasalsabila/kamus-alay/master/colloquial-indonesian-lexicon.csv'\n",
+        "\n",
+        "res=requests.get(SLANG_URL)\n",
+        "with open('slang-indo.csv', 'wb')as f :\n",
+        "  f.write(res.content)\n",
+        "\n",
+        "slang_df=pd.read_csv('slang-indo.csv')\n",
+        "slang_df.head()\n",
+        "\n",
+        "# def slang_to_normal(text):\n",
+        "#     words = text.split()\n",
+        "#     normalized_words = []\n",
+        "#     for word in words:\n",
+        "#         match = slang_df.loc[slang_df['slang'] == word, 'formal']\n",
+        "#         if not match.empty:\n",
+        "#             normalized_words.append(match.iloc[0])\n",
+        "#         else:\n",
+        "#             normalized_words.append(word)\n",
+        "#     return ' '.join(normalized_words)\n",
+        "\n",
+        "def slang_to_normal(text):\n",
+        "    return ' '.join([slang_dict.get(word, word) for word in text.split()])"
+      ],
+      "metadata": {
+        "id": "CviPZgFe-ZTE",
+        "outputId": "d82ef406-104d-4617-f6b9-6f514e61d54f",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        }
+      },
+      "execution_count": 17,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: requests in /usr/local/lib/python3.11/dist-packages (2.32.3)\n",
+            "Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.11/dist-packages (from requests) (3.4.2)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.11/dist-packages (from requests) (3.10)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.11/dist-packages (from requests) (2.4.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.11/dist-packages (from requests) (2025.6.15)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "4QMJbL6lFHpN"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "name": "Welcome To Colab",
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
